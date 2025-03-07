@@ -3,7 +3,7 @@ name: Scrape Job Listings
 on:
     workflow_dispatch:  # Allows manual trigger
     
-    schedule:
+    #schedule:
     # Run at 0 UTC every day
     #  - cron: '0 0 * * *'
 
