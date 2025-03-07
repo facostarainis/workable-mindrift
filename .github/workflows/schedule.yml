@@ -3,9 +3,9 @@ name: Scrape Job Listings
 on:
     workflow_dispatch:  # Allows manual trigger
     
-    #schedule:
+    schedule:
     # Run at 0 UTC every day
-    #  - cron: '0 0 * * *'
+      - cron: '0 0 * * *'
 
 permissions:
     contents: write
@@ -24,7 +24,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-            pip install beautifulsoup4 pandas selenium
+            pip install beautifulsoup4 pandas selenium requests
       
       - name: Run Mindrift scraper
         run: python mindrift.py
