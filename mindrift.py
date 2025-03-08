@@ -116,8 +116,35 @@ else:
     existing_df = pd.DataFrame()
     existing_ids = set()
 
-# Merge new data with existing data
+# Create DataFrame for new jobs
 new_jobs_df = pd.DataFrame(jobs)
+
+# Detect deleted jobs
+if not existing_df.empty:
+    current_ids = set(new_jobs_df['ID'])
+    deleted_ids = existing_ids - current_ids
+
+    # Mark jobs as deleted if they are missing
+    if deleted_ids:
+        print(f"Marking {len(deleted_ids)} jobs as deleted.")
+        for job_id in deleted_ids:
+            existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+
+    # Mark jobs as reposted if they reappear after being deleted
+    for job_id in current_ids:
+        if job_id in existing_ids:
+            deleted_at = existing_df.loc[existing_df['ID'] == job_id, 'Deleted at']
+            reposted_at = existing_df.loc[existing_df['ID'] == job_id, 'Reposted at']
+            
+            # If it was deleted before, keep the deleted date and mark reposted date
+            if not pd.isna(deleted_at).all():
+                existing_df.loc[existing_df['ID'] == job_id, 'Reposted at'] = scraping_date
+
+            # If deleted again after reposting, update deleted date
+            if not pd.isna(reposted_at).all() and job_id not in current_ids:
+                existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+
+# Merge new data with existing data
 merged_df = pd.concat([existing_df, new_jobs_df[~new_jobs_df['ID'].isin(existing_ids)]], ignore_index=True)
 
 # Save merged data to CSV
@@ -157,3 +184,4 @@ for idx, job in new_jobs_df.iterrows():
 
 driver.quit()
 print("Finished scraping individual job details.")
+
