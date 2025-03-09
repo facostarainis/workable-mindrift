@@ -128,21 +128,32 @@ if not existing_df.empty:
     if deleted_ids:
         print(f"Marking {len(deleted_ids)} jobs as deleted.")
         for job_id in deleted_ids:
-            existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+            existing_row = existing_df[existing_df['ID'] == job_id]
+            deleted_at = existing_row['Deleted at'].values[0] if not existing_row.empty else None
+            reposted_at = existing_row['Reposted at'].values[0] if not existing_row.empty else None
+
+            # Check if the job was reposted after being deleted
+            if pd.notna(reposted_at) and pd.to_datetime(reposted_at, dayfirst=True) > pd.to_datetime(deleted_at, dayfirst=True):
+                # Update the deleted date if the job was reposted
+                existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+                print(f"Updated 'Deleted at' for reposted job {job_id}.")
+            elif pd.isna(deleted_at):
+                # If never deleted before, mark as deleted now
+                existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+                print(f"Marked job {job_id} as deleted for the first time.")
 
     # Mark jobs as reposted if they reappear after being deleted
     for job_id in current_ids:
         if job_id in existing_ids:
-            deleted_at = existing_df.loc[existing_df['ID'] == job_id, 'Deleted at']
-            reposted_at = existing_df.loc[existing_df['ID'] == job_id, 'Reposted at']
-            
-            # If it was deleted before, keep the deleted date and mark reposted date
-            if not pd.isna(deleted_at).all():
-                existing_df.loc[existing_df['ID'] == job_id, 'Reposted at'] = scraping_date
+            existing_row = existing_df[existing_df['ID'] == job_id]
+            deleted_at = existing_row['Deleted at'].values[0] if not existing_row.empty else None
+            reposted_at = existing_row['Reposted at'].values[0] if not existing_row.empty else None
 
-            # If deleted again after reposting, update deleted date
-            if not pd.isna(reposted_at).all() and job_id not in current_ids:
-                existing_df.loc[existing_df['ID'] == job_id, 'Deleted at'] = scraping_date
+            # If it was deleted before, keep the deleted date and mark reposted date
+            if pd.notna(deleted_at) and (pd.isna(reposted_at) or pd.to_datetime(reposted_at, dayfirst=True) < pd.to_datetime(scraping_date, dayfirst=True)):
+                existing_df.loc[existing_df['ID'] == job_id, 'Reposted at'] = scraping_date
+                print(f"Marked job {job_id} as reposted.")
+
 
 # Merge new data with existing data
 merged_df = pd.concat([existing_df, new_jobs_df[~new_jobs_df['ID'].isin(existing_ids)]], ignore_index=True)
