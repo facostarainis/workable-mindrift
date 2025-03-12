@@ -30,6 +30,10 @@ jobs:
         run: python mindrift.py
         continue-on-error: true
 
+      - name: Run Individual scraper
+        run: python jobscraper.py
+        continue-on-error: true
+
       - name: Commit and push if there are changes
         run: |
           git config --global user.email "action@github.com"
