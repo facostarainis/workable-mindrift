@@ -95,6 +95,7 @@ for job in job_listings:
         'Scraping Date': scraping_date,
         'Scraping Time': scraping_time,
         'ID': job_id,
+        'Posted at': '',
         'Deleted at': '',
         'Reposted at': '',
         'Job Title': title,
@@ -161,38 +162,4 @@ merged_df = pd.concat([existing_df, new_jobs_df[~new_jobs_df['ID'].isin(existing
 # Save merged data to CSV
 merged_df.to_csv(csv_file, index=False)
 print(f"Merged main job listings saved to {csv_file}.")
-
-# Scrape individual job pages for new jobs only
-for idx, job in new_jobs_df.iterrows():
-    if job['ID'] not in existing_ids:
-        print(f"Scraping details for job ID {job['ID']}")
-        driver.get(job['Apply Link'])
-        time.sleep(3)
-
-        # Handle cookie consent
-        try:
-            cookie_decline_button = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH, "//button[contains(text(), 'Decline all')]"))
-            )
-            cookie_decline_button.click()
-            time.sleep(2)
-        except (NoSuchElementException, TimeoutException):
-            pass
-
-        # Scrape job details
-        job_soup = BeautifulSoup(driver.page_source, 'html.parser')
-        main_section = job_soup.find('main', {'role': 'main'})
-        if main_section:
-            for section in main_section.find_all('section'):
-                header = section.find('h2')
-                if header:
-                    column_name = header.get_text(strip=True)
-                    section_content = section.get_text(separator='\n', strip=True).replace(header.get_text(strip=True), '').strip()
-                    merged_df.loc[merged_df['ID'] == job['ID'], column_name] = section_content
-
-        # Save updated data after each job
-        merged_df.to_csv(csv_file, index=False)
-
-driver.quit()
-print("Finished scraping individual job details.")
 
