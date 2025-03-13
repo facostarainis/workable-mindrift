@@ -92,12 +92,12 @@ for job in job_listings:
     link = 'https://apply.workable.com' + job.find('a')['href']
 
     jobs.append({
-        'Scraping Date': scraping_date,
+        'Scraping Date': scraping_date, #Date and time when the scraper 1st detected the job
         'Scraping Time': scraping_time,
-        'ID': job_id,
-        'Posted at': '',
-        'Deleted at': '',
-        'Reposted at': '',
+        'ID': job_id, #ID
+        'Posted at': '', #This is scraped by jobscraper.py (there's a field with the Job Posting date)
+        'Deleted at': '', #Date when the scraper detects a job deletion -as it autoruns at 0 UTC, the real date should be 1 day before
+        'Reposted at': '', #Date when the scraper detects a job reposting -as it autoruns at 0 UTC, the real date should be 1 day before
         'Job Title': title,
         'Workplace Type': workplace,
         'Location': location,
