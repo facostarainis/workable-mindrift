@@ -1,8 +1,10 @@
 .github/.DS_Store
 .venv/
 .DS_Store
+Analysis/
 individualscraper.py
 fixdeletedat.py
 fixmissingdates.py
 fixscrapingdate.py
 toloka_ai_jobs_dates_corrected.csv
+analyze_jobs.py
