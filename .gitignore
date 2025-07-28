@@ -10,3 +10,8 @@ fixscrapingdate.py
 toloka_ai_jobs_dates_corrected.csv
 analyze_jobs.py
 csv_mass_download.py
+fix_deleted_at.py
+merged_cleaned_jobs.csv
+preserve_first_deleted_at.csv
+compare_deleted_at_change.py
+final_with_change_and_last_date.csv
