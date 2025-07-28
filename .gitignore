@@ -15,3 +15,4 @@ merged_cleaned_jobs.csv
 preserve_first_deleted_at.csv
 compare_deleted_at_change.py
 final_with_change_and_last_date.csv
+instructions.txt
