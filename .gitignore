@@ -2,9 +2,11 @@
 .venv/
 .DS_Store
 Analysis/
+CSVs/
 individualscraper.py
 fixdeletedat.py
 fixmissingdates.py
 fixscrapingdate.py
 toloka_ai_jobs_dates_corrected.csv
 analyze_jobs.py
+csv_mass_download.py
